@@ -1,0 +1,162 @@
+<HTML>
+<HEAD>
+<TITLE>SMS::MT::Service::WirelessServices - SMS::MT plugin module.</TITLE>
+<LINK REL="stylesheet" HREF="../../../../../Active.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SMS::MT::Service::WirelessServices - SMS::MT plugin module.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<LI><A HREF="#object methods">OBJECT METHODS</A></LI>
+	<LI><A HREF="#supported optional parameters to send*() methods">SUPPORTED OPTIONAL PARAMETERS TO send*() METHODS</A></LI>
+	<LI><A HREF="#history">HISTORY</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>SMS::MT::Service::WirelessServices - SMS::MT plugin module.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use SMS::MT;</PRE>
+<PRE>
+    my $sm = new SMS::MT('UID' =&gt; 'joeblow',
+                         'PWD' =&gt; 'secret',
+                         'PLUGIN' =&gt; 'WirelessServices');</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This package contains a class for creating a standalone object or an object
+that acts as a plugin for a SMS::MT receptor object. See the SMS::MT
+documentation for details. This class sends mobile terminated SMS's via
+the interfaces of <A HREF="http://www.wireless-services.nl">http://www.wireless-services.nl</A> .</P>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new ('UID' =&gt; $userid, 'PWD' =&gt; $password);</A></STRONG><BR>
+<DD>
+Returns a new SMS::MT::Service::WirelessServices object.
+<P></P>
+<DT><STRONG><A NAME="item_get_max_text_length"><CODE>get_max_text_length()</CODE></A></STRONG><BR>
+<DD>
+Returns the maximum text length supported by this service.
+<P></P>
+<DT><STRONG><A NAME="item_get_service_name"><CODE>get_service_name()</CODE></A></STRONG><BR>
+<DD>
+Returns the descriptive SMS service name.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="object methods">OBJECT METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_get_last_error_code"><CODE>get_last_error_code()</CODE></A></STRONG><BR>
+<DD>
+Returns the last service specific error code. Below is a list of codes and
+messages specific to this service:
+<PRE>
+ 96     Blocked account
+ 97     Parameter syntax error
+ 98     Insufficient balance
+ 99     Login failed</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_get_last_error_message"><CODE>get_last_error_message()</CODE></A></STRONG><BR>
+<DD>
+Returns the last service specific error message. See <A HREF="#item_get_last_error_code"><CODE>get_last_error_code</CODE></A>.
+<P></P>
+<DT><STRONG><A NAME="item_send_groupicon"><CODE>send_groupicon()</CODE></A></STRONG><BR>
+<DD>
+See SMS::MT documentation.
+<P></P>
+<DT><STRONG><A NAME="item_send_logo"><CODE>send_logo()</CODE></A></STRONG><BR>
+<DD>
+See SMS::MT documentation.
+<P></P>
+<DT><STRONG><A NAME="item_send_picture"><CODE>send_picture()</CODE></A></STRONG><BR>
+<DD>
+See SMS::MT documentation.
+<P></P>
+<DT><STRONG><A NAME="item_send_ringtone"><CODE>send_ringtone()</CODE></A></STRONG><BR>
+<DD>
+See SMS::MT documentation.
+<P></P>
+<DT><STRONG><A NAME="item_send_text"><CODE>send_text()</CODE></A></STRONG><BR>
+<DD>
+See SMS::MT documentation.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="supported optional parameters to send*() methods">SUPPORTED OPTIONAL PARAMETERS TO send*() METHODS</A></H1>
+<P>All send*() methods support optional parameters that are passed as a
+reference to a hash.</P>
+<P>Below is a list of all supported optional parameter keys and what kind of
+values are to be associated with them.</P>
+<DL>
+<DT><STRONG><A NAME="item_FROM">FROM</A></STRONG><BR>
+<DD>
+The value must contain the sender of the message.
+<P></P>
+<DT><STRONG><A NAME="item_VALIDITY">VALIDITY</A></STRONG><BR>
+<DD>
+The value must contain the validity of the message in minutes.
+<P></P>
+<DT><STRONG><A NAME="item_FLASH">FLASH</A></STRONG><BR>
+<DD>
+The value must contain a boolean indicating if this is a flash SMS.
+<P></P>
+<DT><STRONG><A NAME="item_NAME">NAME</A></STRONG><BR>
+<DD>
+The value must contain the name of the ringtone. This name should override any
+name already specified in the RTTTL string.
+<P></P>
+<DT><STRONG><A NAME="item_MSG">MSG</A></STRONG><BR>
+<DD>
+The value must contain the textual message of a picture message.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_Version_0%2E01_2001%2D11%2D06">Version 0.01  2001-11-06</A></STRONG><BR>
+<DD>
+Initial version
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Craig Manley	<A HREF="mailto:c.manley@skybound.nl">c.manley@skybound.nl</A></P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>Copyright (C) 2001 Craig Manley &lt;<A HREF="mailto:c.manley@skybound.nl">c.manley@skybound.nl</A>&gt;.  All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under under the same terms as Perl itself. There is NO warranty;
+not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;SMS::MT::Service::WirelessServices - SMS::MT plugin module.</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>

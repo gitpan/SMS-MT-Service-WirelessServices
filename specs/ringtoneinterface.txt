@@ -1,0 +1,53 @@
+<?php
+
+##########################################################################################
+#	Wireless Services SMS Ringtone Interface for PHP3 and PHP4
+#	Copyright 2000, Wireless Services (http://www.wireless-services.nl)
+#
+#	Parameters:
+#	N = recipients list
+#	RT = ringing tone in RTTTL format
+#	NAME = optional, name of the song (overwrites the name in RT)
+#	TYPE = type of mobile phone, possible values are NOKIA, SAGEM, EMS or MOTOROLA
+#
+#	Parameters N, RT and TYPE are required
+#
+##########################################################################################
+
+$USERNAME	= "gebruikersnaam";
+$PASSWORD	= "wachtwoord";
+$TEST		= 1;					# Delete this line after debugging
+
+##########################################################################################
+# DO NOT MODIFY ANYTHING BELOW THIS LINE
+##########################################################################################
+
+	$host = "www.wireless-services.nl";
+	$path = "/sendringtone.php";
+
+	$data = "UID=".$USERNAME."&PWD=".$PASSWORD."&N=".$N."&RT=".urlencode($RT)."&NAME=".urlencode($NAME)."&TYPE=".$TYPE."&TEST=".$TEST;
+
+	$fp = fsockopen($host, 80, &$errNo, &$errStr);
+	fputs($fp, "POST ".$path." HTTP/1.1\r\n");
+	fputs($fp, "Host: ".$host."\r\n");
+	fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+	fputs($fp, "Content-length: ".strlen($data)."\r\n");
+	fputs($fp, "Connection: close\r\n\r\n");
+	fputs($fp, $data);
+	# Read server response
+	while(!feof($fp)) {
+		$response .= fgets($fp, 128);
+	}
+	fclose($fp);
+
+	print "Server response: ".$response;
+
+	# Response codes:
+	#
+	# 1XX = OK, message send in XX SMS message(s)
+	# 096 = blocked account
+	# 097 = syntax error or missing parameters
+	# 098 = insufficient account balance
+	# 099 = incorrect username and/or password
+
+?>

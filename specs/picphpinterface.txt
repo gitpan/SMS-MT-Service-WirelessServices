@@ -1,0 +1,84 @@
+<?php
+
+##########################################################################################
+#	Wireless Services Picture HTTP Interface for PHP3 and PHP4
+#	Copyright 2000-2001, Wireless Services (http://www.wireless-services.nl)
+#
+#	With this interface you can send group icons, operator logos and picture messages.
+#
+#	Parameters:
+#	N = recipients list
+#	TYPE = Mobile phone type, values: NOKIA (default)/EMS
+#	URL = URL of the logo (including http://...)
+#		or
+#	IMG = Hex encoded string of the image
+#	IMGTYPE = Type of image, values: LOGO/PICTURE/GROUP
+#	IMGFORMAT = Format of image, values: GIF/JPG/PNG/WBMP/RAW
+#
+#	Operator logo:
+#	- IMGTYPE = LOGO
+#	- MC = Mobile operator code (required):
+#			02F440 = Libertel
+#			02F480 = KPN Telecom
+#			02F421 = Telfort
+#			02F461 = Ben
+#			02F402 = Dutchtone
+#	- Max. size: 72 x 21
+#
+#	Picture message
+#	- IMGTYPE = PICTURE
+#	- M = Picture Message Text (optional)
+#	- Max. size: 72 x 28
+#
+#	Group graphic:
+#	- IMGTYPE = GROUP
+#	- Max. size: 72 x 14
+#
+#	Parameters UID, PWD, N, URL or IMG, IMGTYPE, IMGFORMAT are required.
+#
+# Return codes:
+#	096 = Blocked account
+#	097 = Parameter syntax (e.g. incorrect graphic file)
+#	098 = Insufficient balance
+#	099 = Invalid username and/or password
+#	1XX = Success, picture send in XX message(s)
+##########################################################################################
+
+$USERNAME	= "username";
+$PASSWORD	= "password";
+$TEST		= 1;					# Delete this line after debugging
+
+##########################################################################################
+# DO NOT MODIFY ANYTHING BELOW THIS LINE
+##########################################################################################
+
+	if (!empty($URL)) {
+		$fd = @fopen($URL, "r");
+		$data = @fread($fd, 4096);
+		@fclose($fd);
+		for ($i=0; $i < strlen($data); $i++) {
+			$IMG .= sprintf("%02X", ord($data[$i]));
+		}
+	}
+
+	$host = "www.wireless-services.nl";
+	$path = "/sendpic.php";
+
+	$data = "UID=".$USERNAME."&PWD=".$PASSWORD."&URL=".urlencode($URL)."&MC=".$MC."&N=".$N."&IMG=".$IMG."&M=".urlencode($M)."&IMGTYPE=".$IMGTYPE."&IMGFORMAT=".$IMGFORMAT."&TYPE=".$TYPE."&TEST=".$TEST;
+
+	$fp = fsockopen($host, 80, &$errNo, &$errStr);
+	fputs($fp, "POST ".$path." HTTP/1.1\r\n");
+	fputs($fp, "Host: ".$host."\r\n");
+	fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n");
+	fputs($fp, "Content-length: ".strlen($data)."\r\n");
+	fputs($fp, "Connection: close\r\n\r\n");
+	fputs($fp, $data);
+	# Read server response
+	while(!feof($fp)) {
+		$response .= fgets($fp, 128);
+	}
+	fclose($fp);
+
+	print "Server response: ".$response;
+
+?>
