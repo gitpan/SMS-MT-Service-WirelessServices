@@ -131,6 +131,11 @@ name already specified in the RTTTL string.
 <DT><STRONG><A NAME="item_MSG">MSG</A></STRONG><BR>
 <DD>
 The value must contain the textual message of a picture message.
+<P></P>
+<DT><STRONG><A NAME="item_TYPE">TYPE</A></STRONG><BR>
+<DD>
+The type of telephone. This is only relevent for non-textual messages.
+Examples: NOKIA (default), EMS, MOTOROLA, SAGEM.
 <P></P></DL>
 <P>
 <HR>
@@ -139,6 +144,19 @@ The value must contain the textual message of a picture message.
 <DT><STRONG><A NAME="item_Version_0%2E01_2001%2D11%2D06">Version 0.01  2001-11-06</A></STRONG><BR>
 <DD>
 Initial version
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E02_2002%2D01%2D02">Version 0.02  2002-01-02</A></STRONG><BR>
+<DD>
+Added TYPE optional parameter.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E03_2002%2D07%2D01">Version 0.03  2002-07-01</A></STRONG><BR>
+<DD>
+Added support for backup hosts.
+<P></P>
+<DT><STRONG><A NAME="item_Version_0%2E04_2002%2D07%2D03">Version 0.04  2002-07-03</A></STRONG><BR>
+<DD>
+Added support for SAMSUNG telephone type. This is the same as NOKIA, so
+SAMSUNG is changed into NOKIA in _send_request().
 <P></P></DL>
 <P>
 <HR>

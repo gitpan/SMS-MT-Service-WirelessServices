@@ -33,15 +33,13 @@ use Carp;
 use SMS::Image;
 use HTTP::Request::Common qw(POST);
 use LWP::UserAgent;
-
-my %ERRORS = (	'96' => 'Blocked account',
-		'97' => 'Parameter syntax error',
-		'98' => 'Insufficient balance',
-		'99' => 'Login failed');
-
-our $VERSION = '0.01';
-
-1;
+our $VERSION = '0.04';
+our %ERRORS = ('96' => 'Blocked account',
+	       '97' => 'Parameter syntax error',
+	       '98' => 'Insufficient balance',
+	       '99' => 'Login failed');
+our @HOSTS = ('www.wireless-services.nl','www2.wireless-services.nl'); # Unlimited number of (back up) hosts here.
+our $HOST_INDEX = 0; # Index of host to use initially. When error occurs next host in array is used. Index resets to 0 when end of array is reached.
 
 ####
 # Constructor new()
@@ -81,28 +79,54 @@ sub new {
 # Method:	_send_request
 # Description:	Performs a post request via HTTP
 # Parameters:	1. Reference to hash of POST parameters.
+#		2. URI path
 # Returns:	Boolean result
 ####
 sub _send_request {
  my $self = shift;
  my $postparams = shift;
  my $script = shift;
+ if (defined($postparams->{'TYPE'}) && ($postparams->{'TYPE'} eq 'SAMSUNG')) {
+  $postparams->{'TYPE'} = 'NOKIA';
+ }
  $postparams->{'UID'} = $self->{'-UID'};
  $postparams->{'PWD'} = $self->{'-PWD'};
  $self->{'-LAST_ERROR_CODE'} = '';
  $self->{'-LAST_ERROR_MESSAGE'} = '';
  my $ua = new LWP::UserAgent();
  $ua->agent(__PACKAGE__ . "/$VERSION " . $ua->agent());
- my $request = POST("http://www.wireless-services.nl$script",
- 		    Content => $postparams);
- my $response = $ua->request($request);
- unless($response->is_success()) {
-  return $self->_set_error('','HTTP error: ' . $response->status_line());
+ my $initial_host_index = $HOST_INDEX;
+ while (1) {
+  my $host = $HOSTS[$HOST_INDEX];
+  my $request = POST("http://$host$script",
+ 		     Content => $postparams);
+  carp("HTTP request to $host");
+  my $response = $ua->request($request);
+  unless($response->is_success()) {
+   carp("HTTP request to $host failed (code=" . $response->code() . ')');
+   my $next_host_index = ($HOST_INDEX < @HOSTS-1) ? $HOST_INDEX+1 : 0;
+   if ($next_host_index == $initial_host_index) {
+    return $self->_set_error(undef,'HTTP error: ' . $response->status_line());
+   }
+   else {
+    $HOST_INDEX = $next_host_index;
+    next;
+   }
+  }
+  unless($response->content() =~ /^(\d{1,3})\s*$/) {
+   carp('HTTP response invalid: ' . $response->content());
+   my $next_host_index = ($HOST_INDEX < @HOSTS-1) ? $HOST_INDEX+1 : 0;
+   if ($next_host_index == $initial_host_index) {
+    return $self->_set_error(undef,'Invalid response: ' . $response->content());
+   }
+   else {
+    $HOST_INDEX = $next_host_index;
+    next;
+   }
+  }
+  carp("Result code: $1");
+  return $self->_set_error($1);
  }
- unless($response->content() =~ /^(\d{1,3})\s*$/) {
-  return $self->_set_error('','Invalid response: ' . $response->content());
- }
- return $self->_set_error($1);
 }
 
 ####
@@ -118,6 +142,9 @@ sub _set_error {
  my $msg = shift;
  if (defined($msg)) {
   $self->{'-LAST_ERROR_MESSAGE'} = $msg;
+ }
+ unless(defined($code)) {
+  $code = 0;
  }
  my $codenum = $code + 0;
  if (exists($ERRORS{$codenum})) {
@@ -222,6 +249,9 @@ sub send_groupicon {
  if (exists($options->{'FLASH'})) {
   $postparams->{'FLASH'} = $options->{'FLASH'};
  }
+ if (exists($options->{'TYPE'})) {
+  $postparams->{'TYPE'} = $options->{'TYPE'};
+ }
  return $self->_send_request($postparams,'/sendpic.php');
 }
 
@@ -263,6 +293,9 @@ sub send_logo {
  if (exists($options->{'FLASH'})) {
   $postparams->{'FLASH'} = $options->{'FLASH'};
  }
+ if (exists($options->{'TYPE'})) {
+  $postparams->{'TYPE'} = $options->{'TYPE'};
+ }
  return $self->_send_request($postparams,'/sendpic.php');
 }
 
@@ -302,6 +335,9 @@ sub send_picture {
  }
  if (exists($options->{'MSG'})) {
   $postparams->{'M'} = $options->{'MSG'};
+ }
+ if (exists($options->{'TYPE'})) {
+  $postparams->{'TYPE'} = $options->{'TYPE'};
  }
  return $self->_send_request($postparams,'/sendpic.php');
 }
@@ -344,6 +380,9 @@ sub send_ringtone {
  if (exists($options->{'NAME'})) {
   $postparams->{'NAME'} = $options->{'NAME'};
  }
+ if (exists($options->{'TYPE'})) {
+  $postparams->{'TYPE'} = $options->{'TYPE'};
+ }
  return $self->_send_request($postparams,'/sendringtone.php');
 }
 
@@ -381,6 +420,8 @@ sub send_text {
  }
  return $self->_send_request($postparams,'/sendsms.php');
 }
+
+1;
 
 __END__
 
@@ -497,6 +538,11 @@ name already specified in the RTTTL string.
 
 The value must contain the textual message of a picture message.
 
+=item TYPE
+
+The type of telephone. This is only relevent for non-textual messages.
+Examples: NOKIA (default), EMS, MOTOROLA, SAGEM.
+
 =back
 
 
@@ -507,6 +553,19 @@ The value must contain the textual message of a picture message.
 =item Version 0.01  2001-11-06
 
 Initial version
+
+=item Version 0.02  2002-01-02
+
+Added TYPE optional parameter.
+
+=item Version 0.03  2002-07-01
+
+Added support for backup hosts.
+
+=item Version 0.04  2002-07-03
+
+Added support for SAMSUNG telephone type. This is the same as NOKIA, so
+SAMSUNG is changed into NOKIA in _send_request().
 
 =back
 
